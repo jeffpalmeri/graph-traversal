@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
+import breadthFirstTraversal from './algotithms/breadthFirstTraversal';
 import './App.css';
 
 const numRows = 25;
@@ -14,10 +15,6 @@ const generateEmptyGrid = () => {
   }
   return grid;
 };
-
-let currentVertex;
-let i;
-let j;
 
 const App = () => {
   const [grid, setGrid] = useState(() => generateEmptyGrid());
@@ -38,17 +35,7 @@ const App = () => {
     setGrid((g) => {
       let gridCopy = JSON.parse(JSON.stringify(g));
 
-      if (stack.current.length) {
-        currentVertex = stack.current.pop();
-        i = currentVertex[0];
-        j = currentVertex[1];
-        let univsitedNeighbors = getUnivsitedNeighbors(gridCopy, i, j);
-
-        univsitedNeighbors.forEach((neighbor) => {
-          stack.current.push(neighbor);
-          gridCopy[neighbor[0]][neighbor[1]] = 1;
-        });
-      }
+      breadthFirstTraversal(gridCopy, stack.current, getUnivsitedNeighbors);
 
       gridRef.current = gridCopy;
       return gridCopy;
