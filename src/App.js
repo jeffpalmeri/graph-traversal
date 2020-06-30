@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useRef } from 'react';
 import breadthFirstTraversal from './algotithms/breadthFirstTraversal';
+import depthFristTraversal from './algotithms/depthFirstTraversal';
 import './App.css';
 
-const numRows = 25;
-const numColumns = 25;
+const numRows = 20;
+const numColumns = 20;
 
 const generateEmptyGrid = () => {
   let grid = [];
@@ -19,6 +20,7 @@ const generateEmptyGrid = () => {
 const App = () => {
   const [grid, setGrid] = useState(() => generateEmptyGrid());
   const [running, setRunning] = useState(false);
+  const algorithm = useRef('');
   const gridRef = useRef(grid);
   const startingNode = useRef();
   const stack = useRef([startingNode.current]);
@@ -35,7 +37,12 @@ const App = () => {
     setGrid((g) => {
       let gridCopy = JSON.parse(JSON.stringify(g));
 
-      breadthFirstTraversal(gridCopy, stack.current, getUnivsitedNeighbors);
+      if (algorithm.current === 'Breadth First') {
+        breadthFirstTraversal(gridCopy, stack.current, getUnivsitedNeighbors);
+      }
+      if (algorithm.current === 'Depth First') {
+        depthFristTraversal(gridCopy, stack.current, getUnivsitedNeighbors);
+      }
 
       gridRef.current = gridCopy;
       return gridCopy;
@@ -48,7 +55,10 @@ const App = () => {
           numberOfZeros++;
         }
       }
-      if (numberOfZeros === numRows * numColumns) return setRunning(false);
+      if (numberOfZeros === numRows * numColumns) {
+        runningReference.current = false;
+        return setRunning(false);
+      }
     }
 
     setTimeout(runSimulation, 10);
@@ -64,11 +74,21 @@ const App = () => {
   }
 
   const resetGrid = () => {
+    let newGrid = generateEmptyGrid();
     runningReference.current = false;
-    setGrid(() => generateEmptyGrid());
-    gridRef.current = grid;
+    setGrid(newGrid);
+    gridRef.current = newGrid;
     stack.current = [];
     setRunning(false);
+  };
+
+  const selectAlgorithm = (e) => {
+    if (e.target.innerHTML === 'Breadth First') {
+      algorithm.current = 'Breadth First';
+    } else if (e.target.innerHTML === 'Depth First') {
+      algorithm.current = 'Depth First';
+    }
+    console.log(algorithm.current);
   };
 
   let gridRender = grid.map((row, i) => (
@@ -117,6 +137,8 @@ const App = () => {
       >
         Reset
       </button>
+      <button onClick={selectAlgorithm}>Breadth First</button>
+      <button onClick={selectAlgorithm}>Depth First</button>
       <div className='grid'>{gridRender}</div>
     </div>
   );
